@@ -273,7 +273,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-white">
+    <div className="min-h-screen bg-mesh font-sans selection:bg-white selection:text-black flex flex-col">
       {/* Top Navigation */}
       <Navbar
         modelMeta={modelMeta}
@@ -286,16 +286,14 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Live Webcam Scanner & Probability Bars (5 cols) */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
+      <main className="flex-1 w-full max-w-screen-2xl mx-auto p-4 md:p-8 lg:p-12 flex flex-col">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-12 flex-1">
+          {/* Left Column: Live Webcam Scanner & Probability Bars (4 cols) */}
+          <div className="xl:col-span-4 flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <span>Deteksi Gestur Kamera</span>
-                <span className="text-[10px] bg-slate-800 text-amber-400 font-mono px-2 py-0.5 rounded-full border border-slate-700">
-                  Live Feed
-                </span>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-2">
+                <span>SENSOR FEED</span>
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               </h2>
             </div>
 
@@ -311,8 +309,8 @@ export default function App() {
             />
           </div>
 
-          {/* Right Column: Battle Arena & History (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
+          {/* Right Column: Battle Arena & History (8 cols) */}
+          <div className="xl:col-span-8 flex flex-col gap-8">
             <ArenaBoard
               phase={phase}
               countdown={countdown}
@@ -339,24 +337,23 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 px-4 py-4 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="mt-auto border-t border-white/5 bg-[#050505]/50 backdrop-blur-md px-6 py-6 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+        <div className="max-w-screen-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            Batu Gunting Kertas AI © {new Date().getFullYear()} — Teachable Machine & TensorFlow.js
+            VISION CLASH © {new Date().getFullYear()} — TENSORFLOW.JS EDGE INFERENCE
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setIsTutorialOpen(true)}
-              className="hover:text-amber-400 transition-colors cursor-pointer"
+              className="hover:text-zinc-300 transition-colors cursor-pointer"
             >
-              Panduan Latih AI
+              TRAIN AI
             </button>
-            <span>•</span>
             <button
               onClick={() => setIsDeployGuideOpen(true)}
-              className="hover:text-sky-400 transition-colors cursor-pointer"
+              className="hover:text-zinc-300 transition-colors cursor-pointer"
             >
-              Panduan GitHub Pages
+              DEPLOYMENT
             </button>
           </div>
         </div>

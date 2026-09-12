@@ -147,24 +147,25 @@ export const WebcamScanner: React.FC<WebcamScannerProps> = ({
     setIsFacingUser((prev) => !prev);
   };
 
-  const getBorderColor = () => {
+  const getActiveGlow = () => {
+    if (isManualMode) return 'shadow-none border-white/10';
     switch (activeMove) {
       case 'rock':
-        return 'border-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.25)]';
+        return 'border-amber-500/50 shadow-[0_0_40px_rgba(245,158,11,0.15)]';
       case 'scissors':
-        return 'border-sky-500 shadow-[0_0_25px_rgba(14,165,233,0.25)]';
+        return 'border-sky-500/50 shadow-[0_0_40px_rgba(14,165,233,0.15)]';
       case 'paper':
-        return 'border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.25)]';
+        return 'border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.15)]';
       default:
-        return 'border-slate-700 shadow-lg';
+        return 'border-white/10 shadow-none';
     }
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* Viewport Frame */}
       <div
-        className={`relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-slate-950 border-2 transition-all duration-300 ${getBorderColor()}`}
+        className={`relative aspect-[4/3] w-full rounded-[2rem] overflow-hidden bg-black transition-all duration-500 border ${getActiveGlow()}`}
       >
         {/* Video stream element */}
         <video
@@ -174,199 +175,161 @@ export const WebcamScanner: React.FC<WebcamScannerProps> = ({
           autoPlay
           className={`w-full h-full object-cover transition-opacity duration-300 ${
             isFacingUser ? '-scale-x-100' : ''
-          } ${isCameraActive && !cameraError ? 'opacity-100' : 'opacity-0'}`}
+          } ${isCameraActive && !cameraError ? 'opacity-100 grayscale-[0.2] contrast-125' : 'opacity-0'}`}
         />
 
         {/* Fallback Screen when Camera is off or error */}
         {(!isCameraActive || cameraError) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-950/95 z-10">
-            <div className="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 mb-3">
-              <CameraOff className="w-8 h-8 text-amber-500/80" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-black z-10">
+            <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-600 mb-4">
+              <CameraOff className="w-8 h-8" />
             </div>
-            <h3 className="text-base font-bold text-white mb-1">
-              {cameraError ? 'Akses Kamera Terkendala' : 'Kamera Nonaktif'}
+            <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-widest">
+              {cameraError ? 'SENSOR UNAVAILABLE' : 'SENSOR OFFLINE'}
             </h3>
-            <p className="text-xs text-slate-400 max-w-sm mb-4 leading-relaxed">
+            <p className="text-xs text-zinc-500 max-w-sm mb-6 leading-relaxed">
               {cameraError ||
-                'Nyalakan kamera untuk deteksi gestur otomatis dengan Teachable Machine, atau pilih gestur manual di bawah.'}
+                'Enable camera for neural detection, or use the manual override controls below.'}
             </p>
             <button
-              id="btn-retry-camera"
               onClick={startCamera}
-              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-md"
+              className="px-6 py-3 bg-white hover:bg-zinc-200 text-black text-xs font-bold uppercase tracking-widest rounded-full transition-transform active:scale-95 flex items-center gap-2"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Coba Nyalakan Kamera
+              <RefreshCw className="w-4 h-4" />
+              REINITIALIZE
             </button>
           </div>
         )}
 
-        {/* Reticle Viewfinder Corners */}
-        <div className="absolute inset-4 pointer-events-none border border-white/10 rounded-xl">
-          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-amber-400" />
-          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-amber-400" />
-          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-amber-400" />
-          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-amber-400" />
+        {/* Minimalist Reticle */}
+        <div className="absolute inset-6 pointer-events-none opacity-30">
+          <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-white" />
+          <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-white" />
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-white" />
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-white" />
         </div>
 
-        {/* Floating Top Badge: Detected Gesture */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-20 pointer-events-none">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/85 backdrop-blur-md border border-slate-700/80 shadow-lg">
+        {/* Floating Top Badge */}
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20 pointer-events-none">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full glass-panel">
             <span
               className={`w-2 h-2 rounded-full ${
-                activeMove !== 'none' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
+                activeMove !== 'none' ? 'bg-white animate-pulse' : 'bg-zinc-600'
               }`}
             />
-            <span className="text-xs font-bold text-white tracking-wide">
-              {activeMove !== 'none' ? formatMoveIndonesian(activeMove) : 'Tunjukkan Tangan'}
+            <span className="text-[10px] font-bold text-white tracking-widest uppercase">
+              {activeMove !== 'none' ? activeMove : 'AWAITING INPUT'}
             </span>
             {activeMove !== 'none' && (
-              <span className="text-[11px] font-mono font-semibold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded">
-                {Math.round(activeConfidence * 100)}%
+              <span className="text-[10px] font-mono font-bold text-zinc-400 ml-2">
+                {(activeConfidence * 100).toFixed(1)}%
               </span>
             )}
           </div>
 
-          {/* Mode indicator */}
-          <div className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase backdrop-blur-md bg-slate-900/80 border border-slate-700 text-slate-300">
-            {isManualMode ? 'Mode Manual' : isModelLoaded ? 'AI Scanner' : 'Model Kosong'}
+          <div className="px-3 py-2 rounded-full text-[9px] font-bold tracking-widest uppercase glass-panel text-zinc-400">
+            {isManualMode ? 'MANUAL OVR' : isModelLoaded ? 'AI ACTIVE' : 'NO MODEL'}
           </div>
         </div>
 
         {/* Floating Camera Controls Bottom-Right */}
-        <div className="absolute bottom-3 right-3 flex items-center gap-2 z-20">
+        <div className="absolute bottom-4 right-4 flex items-center gap-2 z-20">
           <button
-            id="btn-toggle-camera"
             onClick={toggleCamera}
-            className="p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700 backdrop-blur-md transition-all cursor-pointer shadow-md"
-            title={isCameraActive ? 'Matikan Kamera' : 'Nyalakan Kamera'}
+            className="w-10 h-10 flex items-center justify-center rounded-full glass-panel hover:bg-white/10 text-white transition-all cursor-pointer"
           >
-            {isCameraActive ? <Camera className="w-4 h-4 text-emerald-400" /> : <CameraOff className="w-4 h-4 text-rose-400" />}
+            {isCameraActive ? <Camera className="w-4 h-4" /> : <CameraOff className="w-4 h-4 text-rose-400" />}
           </button>
           <button
-            id="btn-flip-camera"
             onClick={flipCamera}
             disabled={!isCameraActive}
-            className="p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700 backdrop-blur-md transition-all cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
-            title="Putar / Ganti Kamera"
+            className="w-10 h-10 flex items-center justify-center rounded-full glass-panel hover:bg-white/10 text-white transition-all cursor-pointer disabled:opacity-40"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Manual Gesture Simulator Buttons (Useful for quick testing, fallback, or when model training is pending) */}
-      <div className="bg-slate-900/60 rounded-xl p-3 border border-slate-800/80">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-            <Hand className="w-3.5 h-3.5 text-amber-400" />
-            Pilihan Gestur Cepat (Tes / Override)
-          </span>
-          <button
-            id="btn-toggle-manual"
-            onClick={onToggleManualMode}
-            className={`text-[11px] font-semibold px-2 py-0.5 rounded transition-all cursor-pointer ${
-              isManualMode
-                ? 'bg-amber-500 text-slate-950'
-                : 'text-slate-400 hover:text-slate-200 underline'
-            }`}
-          >
-            {isManualMode ? 'Mode Manual Aktif' : 'Gunakan Manual'}
-          </button>
+      {/* Manual Controls & Predictions - Flat UI Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-6">
+        
+        {/* Manual Override Keys */}
+        <div className="glass-panel rounded-3xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold text-zinc-400 tracking-widest uppercase flex items-center gap-2">
+              <Hand className="w-3 h-3" />
+              Manual Override
+            </span>
+            <button
+              onClick={onToggleManualMode}
+              className={`text-[9px] font-bold tracking-widest uppercase px-3 py-1 rounded-full transition-all cursor-pointer ${
+                isManualMode
+                  ? 'bg-white text-black'
+                  : 'text-zinc-500 hover:text-white border border-white/5'
+              }`}
+            >
+              {isManualMode ? 'ACTIVE' : 'ENABLE'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { id: 'rock', icon: '✊', label: 'ROCK' },
+              { id: 'scissors', icon: '✌️', label: 'SCISSORS' },
+              { id: 'paper', icon: '✋', label: 'PAPER' },
+              { id: 'none', icon: '🚫', label: 'IDLE' },
+            ].map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => onManualSelectMove(btn.id as Move)}
+                className={`flex flex-col items-center justify-center gap-2 py-4 rounded-2xl transition-all cursor-pointer border ${
+                  activeMove === btn.id && isManualMode
+                    ? 'bg-white text-black border-transparent'
+                    : 'bg-white/5 text-zinc-500 border-white/5 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <span className="text-2xl filter grayscale opacity-80">{btn.icon}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          <button
-            id="btn-gesture-rock"
-            onClick={() => onManualSelectMove('rock')}
-            className={`py-2 px-1 rounded-lg border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
-              activeMove === 'rock'
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-md'
-                : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800'
-            }`}
-          >
-            <span className="text-xl">✊</span>
-            <span>Batu</span>
-          </button>
+        {/* Telemetry (Probabilities) */}
+        <div className="glass-panel rounded-3xl p-5">
+          <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-5 flex items-center justify-between">
+            <span>Neural Telemetry</span>
+            <span className="font-mono opacity-50">TF.JS</span>
+          </div>
 
-          <button
-            id="btn-gesture-scissors"
-            onClick={() => onManualSelectMove('scissors')}
-            className={`py-2 px-1 rounded-lg border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
-              activeMove === 'scissors'
-                ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-md'
-                : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800'
-            }`}
-          >
-            <span className="text-xl">✌️</span>
-            <span>Gunting</span>
-          </button>
+          <div className="space-y-4">
+            {predictions.map((pred) => {
+              const percent = Math.round(pred.probability * 100);
+              const isActive = pred.mappedMove === activeMove && percent > 20;
 
-          <button
-            id="btn-gesture-paper"
-            onClick={() => onManualSelectMove('paper')}
-            className={`py-2 px-1 rounded-lg border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
-              activeMove === 'paper'
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 shadow-md'
-                : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800'
-            }`}
-          >
-            <span className="text-xl">✋</span>
-            <span>Kertas</span>
-          </button>
-
-          <button
-            id="btn-gesture-none"
-            onClick={() => onManualSelectMove('none')}
-            className={`py-2 px-1 rounded-lg border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
-              activeMove === 'none'
-                ? 'bg-slate-700 text-slate-200 border-slate-500'
-                : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:bg-slate-800'
-            }`}
-          >
-            <span className="text-xl">🚫</span>
-            <span>Netral</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Real-time Probability Bars (Teachable Machine Predictions) */}
-      <div className="bg-slate-900/60 rounded-xl p-3 border border-slate-800/80">
-        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
-          <span>Tingkat Keyakinan AI (Probabilitas)</span>
-          <span className="text-[10px] text-slate-500 font-mono">Teachable Machine</span>
-        </div>
-
-        <div className="space-y-2">
-          {predictions.map((pred) => {
-            const percent = Math.round(pred.probability * 100);
-            const isHighest = pred.mappedMove === activeMove && percent > 25;
-
-            let barColor = 'bg-slate-600';
-            if (pred.mappedMove === 'rock') barColor = 'bg-amber-500';
-            if (pred.mappedMove === 'scissors') barColor = 'bg-sky-500';
-            if (pred.mappedMove === 'paper') barColor = 'bg-emerald-500';
-
-            return (
-              <div key={pred.className} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className={`font-semibold ${isHighest ? 'text-white' : 'text-slate-400'}`}>
-                    {pred.className}
-                  </span>
-                  <span className="font-mono text-[11px] font-bold text-slate-300">
-                    {percent}%
-                  </span>
+              return (
+                <div key={pred.className} className="space-y-2">
+                  <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
+                    <span className={isActive ? 'text-white' : 'text-zinc-500'}>
+                      {pred.className}
+                    </span>
+                    <span className={`font-mono ${isActive ? 'text-white' : 'text-zinc-600'}`}>
+                      {percent}%
+                    </span>
+                  </div>
+                  <div className="w-full h-1 bg-white/5 overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-200 ${
+                        isActive ? 'bg-white' : 'bg-zinc-700'
+                      }`}
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-150 ${barColor}`}
-                    style={{ width: `${percent}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
+
       </div>
     </div>
   );

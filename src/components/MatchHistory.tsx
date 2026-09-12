@@ -18,98 +18,55 @@ export const MatchHistory: React.FC<MatchHistoryProps> = ({
     score.total > 0 ? Math.round((score.player / score.total) * 100) : 0;
 
   return (
-    <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-5 border border-slate-800 shadow-xl">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <History className="w-4 h-4 text-amber-400" />
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-            Riwayat Pertandingan
-          </h3>
-        </div>
+    <div className="glass-panel rounded-3xl p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+          <History className="w-3.5 h-3.5" />
+          MATCH LOG
+        </h3>
 
         {history.length > 0 && (
           <button
             onClick={onClearHistory}
-            className="text-xs text-slate-500 hover:text-rose-400 flex items-center gap-1 transition-all cursor-pointer"
-            title="Hapus riwayat"
+            className="text-[9px] uppercase tracking-widest font-bold text-zinc-500 hover:text-white transition-all cursor-pointer"
           >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Bersihkan</span>
+            CLEAR LOG
           </button>
         )}
       </div>
 
-      {/* Mini Stats Banner */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
-        <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 text-center">
-          <div className="text-[10px] uppercase font-bold text-slate-400">Win Rate</div>
-          <div className="text-lg font-black text-emerald-400">{winRate}%</div>
-        </div>
-        <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 text-center">
-          <div className="text-[10px] uppercase font-bold text-slate-400">Menang</div>
-          <div className="text-lg font-black text-sky-400">{score.player}</div>
-        </div>
-        <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 text-center">
-          <div className="text-[10px] uppercase font-bold text-slate-400">Kalah</div>
-          <div className="text-lg font-black text-rose-400">{score.computer}</div>
-        </div>
-      </div>
-
       {/* History Items */}
       {history.length === 0 ? (
-        <div className="py-8 text-center text-xs text-slate-500">
-          Belum ada ronde yang dimainkan. Mulai ronde pertamamu di atas!
+        <div className="py-12 text-center text-xs text-zinc-600 font-bold uppercase tracking-widest">
+          NO MATCHES RECORDED
         </div>
       ) : (
-        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+        <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
           {history.map((item) => {
-            let resultBadge = (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                <MinusCircle className="w-3 h-3" /> Seri
-              </span>
-            );
-
-            if (item.result === 'win') {
-              resultBadge = (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> Menang
-                </span>
-              );
-            } else if (item.result === 'lose') {
-              resultBadge = (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
-                  <XCircle className="w-3 h-3" /> Kalah
-                </span>
-              );
-            }
-
+            const isWin = item.result === 'win';
+            const isLose = item.result === 'lose';
+            
             return (
               <div
                 key={item.id}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs"
+                className={`min-w-[140px] p-4 rounded-2xl border flex flex-col items-center gap-3 shrink-0 ${
+                  isWin ? 'bg-white/10 border-white/20' : isLose ? 'bg-rose-900/10 border-rose-500/20 opacity-50' : 'bg-white/5 border-white/5 opacity-70'
+                }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-slate-500 font-bold">
-                    #{item.roundNumber}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base" title="Pilihan Kamu">
-                      {getMoveEmoji(item.playerMove)}
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-500">VS</span>
-                    <span className="text-base" title="Pilihan Komputer">
-                      {getMoveEmoji(item.computerMove)}
-                    </span>
-                  </div>
+                <div className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-widest">
+                  ROUND {item.roundNumber}
+                </div>
+                
+                <div className="flex items-center gap-2 text-2xl grayscale">
+                  <span title="Kamu">{getMoveEmoji(item.playerMove)}</span>
+                  <span className="text-[10px] font-bold text-zinc-600">VS</span>
+                  <span title="AI">{getMoveEmoji(item.computerMove)}</span>
                 </div>
 
-                <div className="flex items-center gap-2.5">
-                  {item.confidence > 0 && (
-                    <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
-                      {Math.round(item.confidence * 100)}%
-                    </span>
-                  )}
-                  {resultBadge}
+                <div className={`text-[9px] font-bold uppercase tracking-widest ${
+                  isWin ? 'text-white' : isLose ? 'text-rose-500' : 'text-zinc-400'
+                }`}>
+                  {isWin ? 'WIN' : isLose ? 'LOSE' : 'DRAW'}
                 </div>
               </div>
             );
