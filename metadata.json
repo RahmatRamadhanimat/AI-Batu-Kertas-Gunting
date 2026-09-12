@@ -1,0 +1,11 @@
+{
+  "name": "Batu Gunting Kertas AI",
+  "description": "Game Batu Gunting Kertas dengan deteksi gestur tangan menggunakan Google Teachable Machine dan TensorFlow.js, siap dideploy ke GitHub Pages.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
+
