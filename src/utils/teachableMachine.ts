@@ -38,7 +38,7 @@ export interface TmWebcam {
 
 // Default verified example Teachable Machine model URL for Rock-Paper-Scissors
 // User can easily replace this with their own Teachable Machine link!
-export const DEFAULT_MODEL_URL = 'https://teachablemachine.withgoogle.com/models/I517u8V2z/';
+export const DEFAULT_MODEL_URL = 'https://teachablemachine.withgoogle.com/models/mtEKos-_I/';
 
 /**
  * Normalizes labels from different user models (Indonesian & English variants)
